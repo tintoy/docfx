@@ -1,5 +1,5 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-  <Import Project="..\..\src\Shared\base.props" />
+  <Import Project="..\..\src\Shared\base.netstandard.props" />
 
   <ItemGroup>
     <None Update="docfx.plugins.config;resources\**\*">
@@ -9,10 +9,6 @@
 
   <ItemGroup>
     <PackageReference Include="AutoMapper" Version="5.2.0" />
-  </ItemGroup>
-
-  <ItemGroup Condition="'$(TargetFramework)' == 'net461' OR '$(TargetFramework)' == 'net46' OR '$(TargetFramework)' == 'net452'">
-    <Reference Include="System.Web" />
   </ItemGroup>
 
   <ItemGroup>
