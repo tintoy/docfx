@@ -459,7 +459,12 @@ namespace Microsoft.DocAsCode.Metadata.ManagedReference
                         // When see and seealso are top level nodes in triple slash comments, do not convert it into xref node
                         if (item.Parent?.Parent != null)
                         {
-                            var replacement = XElement.Parse($"<xref href=\"{HttpUtility.UrlEncode(id)}\" data-throw-if-not-resolved=\"false\"></xref>");
+                            // <xref href="id" data-throw-if-not-resolved="false"></xref>
+                            XElement replacement = new XElement("xref",
+                                new XAttribute("href", id),
+                                new XAttribute("data-throw-if-not-resolved", "false"),
+                                new XText(String.Empty)
+                            );
                             item.ReplaceWith(replacement);
                         }
 

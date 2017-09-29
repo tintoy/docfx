@@ -6,7 +6,11 @@
     <GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
   </PropertyGroup>
 
-  <Import Project="../../src/Shared/base.props" />
+  <Import Project="../../src/Shared/base.netcoreapp.props" />
+
+  <PropertyGroup>
+
+  </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.5.0-preview-20170810-02" />

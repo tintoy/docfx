@@ -17,11 +17,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Reference Include="System" />
-    <Reference Include="Microsoft.CSharp" />
-  </ItemGroup>
-
-  <ItemGroup>
     <Folder Include="schemas\v1.0\" />
   </ItemGroup>
 

@@ -1,5 +1,5 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-  <Import Project="..\Shared\test.base.props" />
+  <Import Project="..\Shared\test.base.netcoreapp.props" />
   <ItemGroup>
     <Compile Remove="TestData\snippets\dataflowdegreeofparallelism.cs" />
   </ItemGroup>
@@ -30,6 +30,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="HtmlAgilityPack" Version="1.5.5" />
     <PackageReference Include="System.Net.Http" Version="4.3.2" />
   </ItemGroup>
 
