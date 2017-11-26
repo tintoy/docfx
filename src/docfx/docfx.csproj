@@ -1,5 +1,5 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-  <Import Project="../Shared/base.props" />
+  <Import Project="../Shared/base.netcoreapp.props" />
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <Description>Generates documentation directly from source code and MarkDown files</Description>
@@ -31,6 +31,8 @@
   <ItemGroup>
     <PackageReference Include="CommandLineParser" Version="1.9.71" />
     <PackageReference Include="Owin" Version="1.0.0" />
+    <PackageReference Include="Microsoft.Build" Version="15.3.409" />
+    <PackageReference Include="Microsoft.Build.Runtime" Version="15.3.409" />
     <PackageReference Include="Microsoft.Owin" Version="3.0.1" />
     <PackageReference Include="Microsoft.Owin.FileSystems" Version="3.0.1" />
     <PackageReference Include="Microsoft.Owin.Host.HttpListener" Version="3.0.1" />
