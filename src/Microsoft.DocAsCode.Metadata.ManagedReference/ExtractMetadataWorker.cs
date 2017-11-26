@@ -32,7 +32,7 @@ namespace Microsoft.DocAsCode.Metadata.ManagedReference
         private readonly Dictionary<string, string> _msbuildProperties;
 
         //Lacks UT for shared workspace
-        private AdhocWorkspace _workspace;
+        private Lazy<AdhocWorkspace> _workspace = new Lazy<AdhocWorkspace>(() => new AdhocWorkspace());
 
         internal const string IndexFileName = ".manifest";
 
@@ -886,9 +886,9 @@ namespace Microsoft.DocAsCode.Metadata.ManagedReference
             {
                 Logger.LogVerbose($"Loading solution {path}", file: path);
 
-                _workspace = MSBuildWorkspace.FromSolutionFile(path, _msbuildProperties);
+                _workspace.Value.OpenSolution(path, _msbuildProperties);
 
-                return _workspace.CurrentSolution;
+                return _workspace.Value.CurrentSolution;
             }
             catch (Exception e)
             {
@@ -905,9 +905,7 @@ namespace Microsoft.DocAsCode.Metadata.ManagedReference
                 {
                     Logger.LogVerbose($"Loading project {s}", file: s);
                     
-                    return _workspace.CurrentSolution.Projects.FirstOrDefault(
-                        project => project.FilePath == path
-                    );
+                    return _workspace.Value.OpenProject(path);
                 }
                 catch (AggregateException e)
                 {
