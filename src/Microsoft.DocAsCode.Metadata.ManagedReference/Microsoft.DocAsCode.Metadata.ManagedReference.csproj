@@ -1,5 +1,5 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-  <Import Project="../Shared/base.props" />
+  <Import Project="../Shared/base.netstandard.props" />
 
   <ItemGroup>
     <EmbeddedResource Include="Transform\**;Filters\defaultfilterconfig.yml" Exclude="bin\**;obj\**;**\*.xproj;packages\**;@(EmbeddedResource)" />
@@ -23,7 +23,6 @@
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="2.3.2" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Features" Version="2.3.2" />
     <PackageReference Include="Microsoft.CodeAnalysis.Workspaces.Common" Version="2.3.2" />
-    <PackageReference Include="Microsoft.DotNet.ProjectModel.Workspaces" Version="1.0.0-preview2-003121" />
     <PackageReference Include="Newtonsoft.Json" Version="9.0.1" />
     <PackageReference Include="Microsoft.Composition" Version="1.0.31" />
     <PackageReference Include="System.Collections.Immutable" Version="1.3.1" />

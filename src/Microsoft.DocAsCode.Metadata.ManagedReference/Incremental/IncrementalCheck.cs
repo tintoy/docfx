@@ -10,14 +10,11 @@ namespace Microsoft.DocAsCode.Metadata.ManagedReference
     using System.Linq;
 
     using Microsoft.CodeAnalysis;
-    using Microsoft.CodeAnalysis.MSBuild;
 
     using Microsoft.DocAsCode.Common;
 
     internal class IncrementalCheck
     {
-        private static readonly Lazy<MSBuildWorkspace> Workspace = new Lazy<MSBuildWorkspace>(() => MSBuildWorkspace.Create());
-
         private VersionStamp _versionToBeCompared;
 
         private ConcurrentDictionary<string, VersionStamp> _metadataVersionCache;

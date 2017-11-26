@@ -46,10 +46,6 @@ namespace Microsoft.DocAsCode.Metadata.ManagedReference
         {
             var extension = Path.GetExtension(filePath);
             var fileName = Path.GetFileName(filePath);
-            if (fileName.Equals("project.json", StringComparison.OrdinalIgnoreCase))
-            {
-                return FileType.ProjectJsonProject;
-            }
 
             switch (extension.ToLowerInvariant())
             {

@@ -11,9 +11,6 @@ namespace Microsoft.DocAsCode.Metadata.ManagedReference
 
     internal static class FileInformationExtension
     {
-        public static bool IsSupportedProject(this FileInformation file)
-        {
-            return file.Type == FileType.Project || file.Type == FileType.ProjectJsonProject;
-        }
+        public static bool IsSupportedProject(this FileInformation file) => file.Type == FileType.Project;
     }
 }

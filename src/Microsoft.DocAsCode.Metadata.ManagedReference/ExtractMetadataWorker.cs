@@ -12,13 +12,12 @@ namespace Microsoft.DocAsCode.Metadata.ManagedReference
     using System.Threading.Tasks;
 
     using Microsoft.CodeAnalysis;
-    using Microsoft.CodeAnalysis.MSBuild;
-    using Microsoft.DotNet.ProjectModel.Workspaces;
 
     using Microsoft.DocAsCode.Common;
     using Microsoft.DocAsCode.DataContracts.Common;
     using Microsoft.DocAsCode.DataContracts.ManagedReference;
     using Microsoft.DocAsCode.Exceptions;
+    using Microsoft.DocAsCode.Metadata.ManagedReference.MSBuildWorkspaces;
 
     public sealed class ExtractMetadataWorker : IDisposable
     {
@@ -33,7 +32,7 @@ namespace Microsoft.DocAsCode.Metadata.ManagedReference
         private readonly Dictionary<string, string> _msbuildProperties;
 
         //Lacks UT for shared workspace
-        private readonly Lazy<MSBuildWorkspace> _workspace;
+        private AdhocWorkspace _workspace;
 
         internal const string IndexFileName = ".manifest";
 
@@ -68,16 +67,6 @@ namespace Microsoft.DocAsCode.Metadata.ManagedReference
             {
                 _msbuildProperties["Configuration"] = "Release";
             }
-
-            _workspace = new Lazy<MSBuildWorkspace>(() =>
-            {
-                var workspace = MSBuildWorkspace.Create(_msbuildProperties);
-                workspace.WorkspaceFailed += (s, e) =>
-                {
-                    Logger.LogWarning($"Workspace failed with: {e.Diagnostic}");
-                };
-                return workspace;
-            });
         }
 
         public async Task ExtractMetadataAsync()
@@ -206,7 +195,7 @@ namespace Microsoft.DocAsCode.Metadata.ManagedReference
                 foreach (var path in solutions)
                 {
                     documentCache.AddDocument(path, path);
-                    var solution = await GetSolutionAsync(path);
+                    var solution = GetSolution(path);
                     if (solution != null)
                     {
                         foreach (var project in solution.Projects)
@@ -233,15 +222,6 @@ namespace Microsoft.DocAsCode.Metadata.ManagedReference
                 {
                     GetProject(projectCache, pp.NormalizedPath);
                 }
-            }
-
-            if (_files.TryGetValue(FileType.ProjectJsonProject, out var pjp))
-            {
-                await pjp.Select(s => s.NormalizedPath).ForEachInParallelAsync(path =>
-                {
-                    projectCache.GetOrAdd(path, s => GetProjectJsonProject(s));
-                    return Task.CompletedTask;
-                }, 60);
             }
 
             foreach (var item in projectCache)
@@ -900,14 +880,15 @@ namespace Microsoft.DocAsCode.Metadata.ManagedReference
             return result;
         }
 
-        private async Task<Solution> GetSolutionAsync(string path)
+        private Solution GetSolution(string path)
         {
             try
             {
                 Logger.LogVerbose($"Loading solution {path}", file: path);
-                var solution = await _workspace.Value.OpenSolutionAsync(path);
-                _workspace.Value.CloseSolution();
-                return solution;
+
+                _workspace = MSBuildWorkspace.FromSolutionFile(path, _msbuildProperties);
+
+                return _workspace.CurrentSolution;
             }
             catch (Exception e)
             {
@@ -923,15 +904,10 @@ namespace Microsoft.DocAsCode.Metadata.ManagedReference
                 try
                 {
                     Logger.LogVerbose($"Loading project {s}", file: s);
-                    var project = _workspace.Value.CurrentSolution.Projects.FirstOrDefault(
-                        p => FilePathComparer.OSPlatformSensitiveRelativePathComparer.Equals(p.FilePath, s));
-
-                    if (project != null)
-                    {
-                        return project;
-                    }
-
-                    return _workspace.Value.OpenProjectAsync(s).Result;
+                    
+                    return _workspace.CurrentSolution.Projects.FirstOrDefault(
+                        project => project.FilePath == path
+                    );
                 }
                 catch (AggregateException e)
                 {
@@ -944,21 +920,6 @@ namespace Microsoft.DocAsCode.Metadata.ManagedReference
                     return null;
                 }
             });
-        }
-
-        private Project GetProjectJsonProject(string path)
-        {
-            try
-            {
-                Logger.LogVerbose($"Loading project {path}", file: path);
-                var workspace = new ProjectJsonWorkspace(path);
-                return workspace.CurrentSolution.Projects.FirstOrDefault(p => p.FilePath == Path.GetFullPath(path));
-            }
-            catch (Exception e)
-            {
-                Logger.Log(LogLevel.Warning, $"Error opening project {path}: {e.Message}. Ignored.");
-                return null;
-            }
         }
 
         /// <summary>
